@@ -8,9 +8,9 @@ import './screens/orders_screen.dart';
 import './screens/user_products_screen.dart';
 import './screens/edit_product_screen.dart';
 
-import './models/products.dart';
-import './models/cart.dart';
-import './models/orders.dart';
+import './providers/products.dart';
+import './providers/cart.dart';
+import './providers/orders.dart';
 
 void main() => runApp(MyApp());
 
