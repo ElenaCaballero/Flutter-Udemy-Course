@@ -12,7 +12,7 @@ class OrdersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Orders'),
+        title: Text('Your Orders'),
       ),
       drawer: AppDrawer(),
       body: FutureBuilder(
