@@ -59,6 +59,7 @@ class Auth with ChangeNotifier {
       );
       _autoLogout();
       notifyListeners();
+      SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
       final userData = json.encode(
         {
@@ -74,11 +75,11 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> signUp(String email, String password) async {
-    return _authenticate(email, password, 'signupNewUser');
+    return _authenticate(email, password, 'signUp');
   }
 
   Future<void> logIn(String email, String password) async {
-    return _authenticate(email, password, 'verifyPassword');
+    return _authenticate(email, password, 'signInWithPassword');
   }
 
   Future<bool> tryAutoLogin() async {
@@ -110,7 +111,6 @@ class Auth with ChangeNotifier {
     }
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
-    // prefs.remove('userData');
     prefs.clear();
   }
 
