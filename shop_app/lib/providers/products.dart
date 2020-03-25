@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/http_exception.dart';
+import '../helpers/secrets.dart';
 
 class Product with ChangeNotifier {
   final String id;
@@ -27,11 +28,17 @@ class Product with ChangeNotifier {
     notifyListeners();
   }
 
+  static Future<String> _getFirebaseBaseUrl() async {
+    final secret = await SecretLoader(secretPath: "secrets.json").load();
+    return secret.baseUrl;
+  }
+
   Future<void> toggleFavoriteStatus(String authToken, String userId) async {
     final oldStatus = isFavorite;
     _setFavValue(!isFavorite);
+    final baseUrl = await _getFirebaseBaseUrl();
     final url =
-        'https://flutter-demo-53e5a.firebaseio.com/userFavorites/$userId/$id.json?auth=$authToken';
+        '$baseUrl/userFavorites/$userId/$id.json?auth=$authToken';
     try {
       final response = await http.put(
         url,
@@ -68,17 +75,23 @@ class Products with ChangeNotifier {
     return _items.firstWhere((prod) => prod.id == id);
   }
 
+  static Future<String> _getFirebaseBaseUrl() async {
+    final secret = await SecretLoader(secretPath: "secrets.json").load();
+    return secret.baseUrl;
+  }
+
   Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
     final filterString = filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
+    final baseUrl = await _getFirebaseBaseUrl();
     var url =
-        'https://flutter-demo-53e5a.firebaseio.com/products.json?auth=$authToken&$filterString';
+        '$baseUrl/products.json?auth=$authToken&$filterString';
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       if (extractedData == null) {
         return;
       }
-      url = 'https://flutter-demo-53e5a.firebaseio.com/userFavorites/$userId.json?auth=$authToken';
+      url = '$baseUrl/userFavorites/$userId.json?auth=$authToken';
       final favoriteResponse = await http.get(url);
       final favoriteData = json.decode(favoriteResponse.body);
       final List<Product> loadedProducts = [];
@@ -100,8 +113,9 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
+    final baseUrl = await _getFirebaseBaseUrl();
     final url =
-        'https://flutter-demo-53e5a.firebaseio.com/products.json?auth=$authToken';
+        '$baseUrl/products.json?auth=$authToken';
     try {
       final response = await http.post(
         url,
@@ -131,8 +145,9 @@ class Products with ChangeNotifier {
   void updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
+      final baseUrl = await _getFirebaseBaseUrl();
       final url =
-          'https://flutter-demo-53e5a.firebaseio.com/products/$id.json?auth=$authToken';
+          '$baseUrl/products/$id.json?auth=$authToken';
       await http.patch(url,
           body: json.encode({
             'title': newProduct.title,
@@ -146,8 +161,9 @@ class Products with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) async {
+    final baseUrl = await _getFirebaseBaseUrl();
     final url =
-        'https://flutter-demo-53e5a.firebaseio.com/products/$id.json?auth=$authToken';
+        '$baseUrl/products/$id.json?auth=$authToken';
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     var existingProduct = _items[existingProductIndex];
 

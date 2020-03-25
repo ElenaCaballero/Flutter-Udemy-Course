@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/http_exception.dart';
+import '../helpers/secrets.dart';
 
 class Auth with ChangeNotifier {
   String _token;
@@ -30,9 +31,15 @@ class Auth with ChangeNotifier {
     return _userId;
   }
 
+  static Future<String> _getFirebaseApiKey() async {
+    final secret = await SecretLoader(secretPath: "secrets.json").load();
+    return secret.apiKey;
+  }
+
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
-    final url = 'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyDsfpTmnePbTD7wX0xfaIWvP3aqN3KGGPA';
+    final api_key = await _getFirebaseApiKey();
+    final url = 'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=$api_key';
     try {
       final response = await http.post(
         url,

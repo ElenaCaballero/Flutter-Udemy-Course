@@ -17,14 +17,18 @@ class LocationInput extends StatefulWidget {
 class _LocationInputState extends State<LocationInput> {
   String _previewImageUrl;
 
-  void _showPreview(double lat, double lng) {
-    final staticMapImageUrl = LocationHelper.generateLocationPreviewImage(
-      latitude: lat,
-      longitude: lng,
-    );
-    setState(() {
-      _previewImageUrl = staticMapImageUrl;
-    });
+  Future<void> _showPreview(double lat, double lng) async {
+    try {
+      final staticMapImageUrl = await LocationHelper.generateLocationPreviewImage(
+        latitude: lat,
+        longitude: lng,
+      );
+      setState(() {
+        _previewImageUrl = staticMapImageUrl;
+      });
+    } catch (error) {
+      return;
+    }
   }
 
   Future<void> _getCurrentUserLocation() async {
